@@ -1,0 +1,33 @@
+{
+  "clip_filename": "clip_c0784adb.wav",
+  "duration_seconds": 20.8,
+  "created_at": 1789446152.0,
+  "quality": {
+    "overall_score": 86,
+    "rating": "Excelente",
+    "speaker_similarity": 72,
+    "acoustic_clarity": 97,
+    "pacing_score": 93,
+    "mos_score": 4.69,
+    "clipping_detected": false,
+    "snr_db": 43.2,
+    "duration_seconds": 20.8,
+    "details": "Buena correspondencia de voz. Audio limpio y cristalino sin ruido de fondo. Cadencia y ritmo de pronunciación naturales.",
+    "attempt_number": 1,
+    "total_attempts": 1,
+    "threshold_set": 75,
+    "met_threshold": true,
+    "attempts_history": [
+      {
+        "attempt": 1,
+        "score": 86,
+        "rating": "Excelente",
+        "similarity": 72,
+        "clarity": 97
+      }
+    ],
+    "attempts_count": 1
+  },
+  "text_prompt": "El error: \"fallo temporal\", ocurre cuando el sistema no puede traducir los nombres de dominio a dire",
+  "sample_used": "david_5_2.wav"
+}

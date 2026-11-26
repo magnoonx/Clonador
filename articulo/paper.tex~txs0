@@ -1,0 +1,263 @@
+\documentclass[conference]{IEEEtran}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{hyperref}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{Evaluación acústico-neural en bucle cerrado y auto optimización de parámetros en un marco híbrido Zero-Shot TTS/RVC}
+
+\author{
+\IEEEauthorblockN{David Enrique Duarte Gonzalez}
+\IEEEauthorblockA{\textit{Dirección de Informática} \\
+\textit{Universidad de Carabobo}\\
+Valencia, Venezuela \\
+deduarte1@uc.edu.ve \\
+ORCID: \href{https://orcid.org/0000-0002-8180-0274}{0000-0002-8180-0274}}
+}
+
+\maketitle
+
+\begin{abstract}
+Los sistemas de síntesis de voz texto a voz (TTS) con clonación de voz \emph{zero-shot} han demostrado capacidades impresionantes mediante arquitecturas autorregresivas y vocoders neuronales. Sin embargo, la mayoría de las implementaciones existentes operan en una configuración de bucle abierto, entregando audio sintetizado sin una validación objetiva en tiempo real de la similitud tímbrica, la claridad acústica o la cadencia rítmica. Esta falta de supervisión activa de calidad conduce frecuentemente a artefactos digitales, alucinaciones prosódicas o degradación de la identidad del hablante. En este artículo, proponemos un nuevo marco híbrido en bucle cerrado para la clonación de voz local de alta fidelidad. El sistema combina un motor primario de síntesis neuronal XTTS-v2, un módulo de refinamiento tímbrico basado en conversión de voz por recuperación (RVC), y un evaluador automatizado multimétrica que mide en tiempo real la similitud coseno del hablante, la relación señal-ruido (SNR), la distorsión por recorte digital (\emph{clipping}) y la cadencia en palabras por minuto (WPM). Además, un motor de optimización adaptativo en bucle cerrado activa automáticamente la generación en múltiples intentos con hiperparámetros de muestreo ajustados dinámicamente (\texttt{temperature}, \texttt{top\_p}, \texttt{repetition\_penalty}) siempre que la puntuación global de calidad cae por debajo de un umbral objetivo mínimo. Asimismo, se integran directrices fundamentales de seguridad, ética y requisitos previos indispensables antes de ejecutar procesos de clonación vocal. La evaluación preliminar indica que la integración del refinamiento RVC con la retroalimentación de calidad en bucle cerrado mejora significativamente la fidelidad del hablante y minimiza las salidas de audio defectuosas en comparación con las canalizaciones tradicionales de bucle abierto.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Clonación de Voz Zero-Shot, XTTS-v2, RVC, Evaluación de Calidad de Habla, Control en Bucle Cerrado, Embeddings de Hablante, Relación Señal-Ruido, Seguridad Vocal, Biometría, Ética de IA.
+\end{IEEEkeywords}
+
+\section{Introducción}
+
+En el contexto de la investigación en procesamiento del audio, clonación vocales y síntesis vocal (TTS) y la retroalimentación de calidad en bucle cerrado (RVC), los avances recientes han puesto énfasis en modelos llamados Zero-Shot TTS/RVC  que no requieren conocimiento previo sobre el contenido a sintetizar o la voz de referencia \cite{casanova2022yourtts}. 
+
+El propósito de los modelos TTS zero-shot es sintetizar un texto determinado utilizando un discurso de referencia para replicar con exactitud sus características acústicas \cite{zhang2025advancing}.
+
+La síntesis moderna de texto a voz (TTS) ha evolucionado desde enfoques paramétricos y concatenativos hacia arquitecturas neuronales profundas, capaces de clonar hablantes objetivo arbitrarios utilizando únicamente unos pocos segundos de audio de referencia no transcrito (\emph{Adaptación de Hablante Zero-Shot}) \cite{shen2018natural}. 
+
+En la actualidad se utilizan sistemas de síntesis de voz que utiliza técnicas más avanzadas en procesamiento del audio digital, como por ejemplo, el XTTS. La sintetización de voz, usando la tecnología XTTS, ha revolucionado el campo de la comunicación humana \cite{rabiner2007introduction}.
+
+Modelos como XTTS-v2 \cite{casanova2024xtts} aprovechan codificadores de hablante profundos y modelado autorregresivo del lenguaje de audio para capturar características acústicas sutiles.
+
+A pesar de estos avances, los sistemas \emph{zero-shot} de bucle abierto sufren vulnerabilidades técnicas clave:
+\begin{enumerate}
+    \item \textbf{Inestabilidad prosódica y alucinaciones:} Los decodificadores autorregresivos basados en muestreo son propensos a repeticiones de palabras, omisiones o pausas poco naturales bajo configuraciones de hiperparámetros no óptimas.
+    \item \textbf{Deriva del hablante (\emph{Speaker Drift}):} Cuando las muestras de referencia contienen ruido de fondo o tienen una duración muy corta ($<5$ segundos), la fidelidad tímbrica del objetivo se deteriora.
+    \item \textbf{Ausencia de retroalimentación de calidad en tiempo real:} Los sistemas convencionales realizan la síntesis sin evaluar el audio resultante antes de su entrega.
+\end{enumerate}
+
+\cite{zhang2025minimax}
+
+En este marco híbrido, se ha explorado una serie de técnicas y algoritmos para mejorar las características acústico-neuronales en los modelos Zero-Shot en combinacion con técnicas TTS/RVC. Estos avances han permitido la optimización manual o heurística del conjunto de parámetros hiperparámetricos, que son cruciales para garantizar el rendimiento y calidad durante las inferencias o entrenamientos.
+
+Sin embargo, existen limitaciones actuales en los modelos descritos. En particular:
+
+\begin{itemize}
+	\item Optimización Manual/Heurística: Actualmente no se han implementado mecanismos eficientes para optimizar manualmente o heurísticamente el conjunto de parámetros hiperparámetrico que son cruciales.
+	
+	\item Bucle Cerrado y Retroalimentación Continua: No existe un bucle cerrado definido en los modelos Zero-Shot TTS/RVC, ni una retroalimentación continua basada en la calidad acústico-neuronales durante las inferencias o entrenamientos que permita mejorar directamente el rendimiento y calidad.
+\end{itemize}
+
+Para superar estos desafíos, presentamos un sistema de clonación de voz en bucle cerrado que combina síntesis neuronal multietapa, evaluación automática de la calidad acústica, sintonización adaptativa de hiperparámetros y un marco ético de seguridad. En mayor detalle, la propuesta se puede desglosar de la siguiente forma:
+
+\begin{itemize}
+	\item Arquitectura: El diseño de un marco híbrido integrado que unifica la generación de texto a voz Zero-Shot con la conversión de voz basada en recuperación (RVC).
+	
+	\item Mecanismo de Evaluación: La implementación de un módulo acústico-neural en bucle cerrado que cuantifica objetivamente la similitud de identidad (Speaker Encoder Cosine Similarity - SECS) y la naturalidad sin intervención humana.
+	
+\item Algoritmo de Auto-optimización: Un método automatizado para la búsqueda de hiperparámetros óptimos que reduce la latencia de configuración y supera la calidad de los ajustes manuales promedio.
+	
+	\item Corpus/Evaluación: Una evaluación exhaustiva (subjetiva con MOS y objetiva con métricas neuronales) que demuestra la superioridad del enfoque propuesto frente a baselines en bucle abierto.
+
+\item Seguridad y Despliegue Local: La concepción de una arquitectura de ejecución estrictamente local  que garantiza la privacidad por diseño y la soberanía de la huella vocal. Este aislamiento mitiga el riesgo de suplantación y recolección no consentida de datos biométricos inherente a las APIs en la nube. A su vez, se analizan críticamente los compromisos (trade-offs) de este enfoque, contrastando la máxima seguridad de los datos con la desventaja operativa de requerir hardware de usuario con alta capacidad computacional para sostener la inferencia iterativa.
+
+
+\end{itemize}
+
+\section{Trabajo Relacionado}
+
+\subsection{¿Por qué un sistema local?}
+
+Como señalan \cite{sharma2026voice}, la proliferación de modelos de voz generativa ha desencadenado riesgos sin precedentes en seguridad y privacidad, derivados de la clonación no consentida de biometría vocal. Su análisis empírico revela que las arquitecturas de procesamiento actuales exponen a los individuos a suplantaciones severas al no proteger adecuadamente la huella acústica. Esta vulnerabilidad sistémica valida la arquitectura local que proponemos en esta investigación. 
+
+Al prescindir de servicios en la nube para la sintonización de hiperparámetros, nuestro marco de evaluación en bucle cerrado asegura que los audios de referencia y los procesos de conversión TTS/RVC se ejecuten estrictamente fuera de línea. Esto blinda el flujo de trabajo contra la interceptación o recolección de datos, demostrando que es posible alcanzar una optimización acústica superior sin comprometer la seguridad de la información del hablante.
+
+\subsection{Métricas Objetivas de Calidad de Habla}
+
+Como señalan \cite{cooper2024review}, la evaluación del habla sintética ha experimentado un cambio de paradigma: desde las costosas y lentas pruebas subjetivas humanas (MOS) hacia metodologías objetivas automatizadas impulsadas por redes neuronales profundas y modelos de aprendizaje autosupervisado. Esta evolución metodológica respalda la premisa central de nuestra investigación. Al validar que las métricas neuronales modernas pueden igualar el estándar de oro de la percepción humana sin su latencia asociada, se justifica la implementación de nuestro módulo de evaluación en bucle cerrado. 
+
+Esto nos permite transformar algoritmos de calificación pasiva en un mecanismo de auto-optimización activa, capaz de ajustar los parámetros de conversión del marco Zero-Shot TTS/RVC de forma autónoma durante la inferencia.
+
+\subsection{Conversión de Voz Basada en Recuperación (RVC)}
+
+Abordando los retos de la escasez de datos en tecnologías del habla, \cite{kamble2023custom} demostraron la viabilidad de utilizar modelos de inteligencia artificial generativa para construir corpus vocales personalizados. Para ello, propusieron dos arquitecturas complementarias: la primera basada en la optimización del modelo de síntesis Bark mediante HuBERT y enCodec, y la segunda fundamentada en el uso de RVC para la conversión de voz. Estas aproximaciones ilustran métodos efectivos no solo para mejorar el entrenamiento de sistemas ASR, sino para garantizar la generación de voces clonadas con alta calidad acústica.
+
+Aunque dicho trabajo demuestra el potencial del estado del arte al combinar RVC con modelos neuronales como HuBERT, su despliegue sigue dependiendo de configuraciones estáticas. Nuestra investigación expande este horizonte metodológico al introducir un mecanismo de evaluación en bucle cerrado que automatiza la sintonización de los parámetros del RVC, garantizando la máxima fidelidad acústica y adaptabilidad que un modelo de bucle abierto no puede asegurar de forma autónoma.
+
+\subsection{Texto a Voz Neuronal Zero-Shot}
+
+Aunque arquitecturas basadas en VITS como YourTTS \cite{casanova2022yourtts} han logrado avances significativos en TTS zero-shot multilingüe, su capacidad para replicar con alta fidelidad características vocales complejas fuera de distribución (OOD) sigue dependiendo de procesos de fine-tuning de al menos un minuto de audio. Esta dependencia del reentrenamiento o ajuste de pesos subraya las limitaciones de operar exclusivamente con arquitecturas TTS puras para la clonación instantánea de alta fidelidad, motivando la exploración de enfoques alternativos, como la integración de conversión de voz basada en recuperación (RVC), para eludir el reentrenamiento de los modelos acústicos.
+
+En consecuencia, los hallazgos en arquitecturas como YourTTS fundamentan directamente la necesidad de nuestro enfoque: un marco híbrido que descarta el fine-tuning y lo reemplaza por una auto-optimización de parámetros en tiempo de inferencia, garantizando la fidelidad acústica mediante evaluación en bucle cerrado sin alterar los pesos del modelo original.
+
+
+
+
+
+
+
+\section{Arquitectura del Sistema Propuesto}
+El marco de trabajo consta de tres componentes principales: el motor primario TTS (XTTS-v2), el módulo secundario de refinamiento tímbrico (RVC), y el evaluador de calidad en bucle cerrado con motor de reintento automático.
+
+\subsection{Canalización de Síntesis}
+
+\subsubsection{Generación Base (XTTS-v2):}
+Dada una secuencia de texto de entrada $T$ y una muestra de audio de referencia del hablante objetivo $A_{\text{ref}}$, el codificador de hablante extrae 
+
+\begin{equation}
+	\mathbf{e}_{\text{ref}} = E_{\text{hablante}}(A_{\text{ref}}) 
+\end{equation}
+
+Simultáneamente, el texto $T$ es procesado en una secuencia de tokens lingüísticos. El modelo autorregresivo, condicionado de manera cruzada por $e_{ref}$ y la semántica del texto, predice una secuencia de tokens acústicos discretos. Finalmente, un decodificador neuronal transforma estas representaciones latentes en una forma de onda bruta $y_{tts}(t)$.
+
+Aunque $y_{tts}(t)$ captura exitosamente la prosodia, la cadencia y el contenido fonético deseado, el modelado Zero-Shot en un solo paso suele presentar degradación en frecuencias altas o inestabilidad en la identidad del hablante fuera de distribución (OOD). Por lo tanto, esta forma de onda actúa únicamente como la plantilla estructural (base-voice) para la siguiente etapa.
+\subsubsection{Refinamiento Tímbrico mediante Recuperación (RVC):}
+
+Cuando el refinamiento por RVC está habilitado, las características de contenido $E_{\text{contenido}}(y_{\text{tts}})$ se extraen mediante una representación del habla autosupervisada mejorada usando la separación de hablantes \cite{softness2023contentvec} y se combinan con la recuperación de vectores de acondicionamiento del hablante objetivo para generar una forma de onda alineada tímbricamente $y_{\text{rvc}}(t)$.
+
+Este proceso tridimensional extrae, recupera y sintetiza:
+
+\begin{itemize}
+	\item Extracción de características: Un codificador autosupervisado profundo extrae las representaciones semánticas y fonéticas latentes 
+	
+	\begin{equation}
+	Z_c = E_{contenido}(y_{tts})	
+	\end{equation}
+	
+	Desenredando el habla del timbre original generado por el XTTS. En paralelo, un algoritmo de estimación de frecuencia fundamental (como RMVPE) extrae el contorno de pitch 
+	
+	\begin{equation}
+		P = E_{pitch}(y_{tts})
+	\end{equation} 
+	
+	Para preservar la entonación exacta.
+	
+	\item Recuperación (Retrieval): Para inyectar la identidad del hablante objetivo, el sistema consulta un índice vectorial de alta eficiencia (basado en FAISS) construido previamente con los embeddings del hablante. Este índice recupera las características acústicas más cercanas a $Z_c$, sustituyéndolas para formar un vector de contenido condicionado $Z'_c$.
+	
+	\item Decodificación: Finalmente, un generador basado en la arquitectura HiFi-GAN sintetiza la forma de onda final alineada tímbricamente:
+	
+	\begin{equation}
+	y_{rvc}(t) = G(Z'_c, P, e_{ref})
+	\end{equation}
+	
+	El resultado, $y_{rvc}(t)$, es un audio que hereda la naturalidad y cadencia del TTS, siendo $G$ el generador  operador matemático que procesa las variables de entrada para esculpir el audio final, en funcion de $Z_{c}^{\prime}$  que son las características de contenido linguistico recuperadas, tales como fonemas y palabras, usando modelos como \textit{HuBERT} o \textit{ContentVec}, y luego se hace una búsqueda de similitud contra el índice .index del hablante objetivo.
+	 
+	
+El Pitch \(P\) representa la melodía, la entonación y la altura de la voz extraída directamente del audio original para que la canción o el habla mantengan el mismo ritmo y entonación emocional, y por último  \(e_{\text{ref}}\), que es el \textit{embedding} de referencia del hablante, el vector de identidad fija que describe las propiedades físicas globales y permanentes del timbre de la voz destino.
+	
+	
+	
+	
+	
+	
+\end{itemize}
+
+\subsection{Evaluación Automatizada en Bucle Cerrado}
+El módulo \texttt{VoiceQualityEvaluator} calcula un vector de métricas acústicas y de hablante $M = [S_{\text{hablante}}, S_{\text{acústica}}, S_{\text{cadencia}}, \text{MOS}_{\text{est}}, C_{\text{recorte}}, \text{SNR}_{\text{dB}}]$, y constituye un marco de evaluación no intrusivo y semi-supervisado diseñado para auditar clips de audio sintetizados mediante motores de texto a voz (TTS) y conversión tímbrica (RVC). 
+
+Este sistema sintetiza métricas de la teoría de procesamiento digital de señales (DSP), análisis espectro-temporal y extracción de embeddings neuronales profundos.
+
+\subsubsection{Formulación Matemática del Modelo}
+
+La calificación global de calidad $S_{\text{overall}} \in [10, 99]$ se define como una función objetiva ponderada compuesta por tres dimensiones fundamentales, combinada con un operador de penalización $\Omega_{\text{penalty}}$ por defectos psicoacústicos o temporales:
+
+\begin{equation}
+	\begin{split}
+		S_{\text{overall}} = \text{clip}\Big( &\big(w_1 \cdot S_{\text{hablante}} + w_2 \cdot S_{\text{acústica}} \\
+		&+ w_3 \cdot S_{\text{cadencia}}\big) - \Omega_{\text{penalización}}, 10, 99 \Big)
+	\end{split}
+\end{equation}
+
+Donde los pesos vectoriales están calibrados empíricamente a: $$w_1 = 0.40, \quad w_2 = 0.40, \quad w_3 = 0.20$$
+
+\subsubsection{Análisis de Claridad Acústica y Señal ($S_{\text{acústica}}$)}
+
+La dimensión acústica evalúa la relación señal/ruido ($\text{SNR}$), la distorsión por saturación digital (clipping) y la distribución espectral de frecuencias.
+
+\subsubsection{Detección de Saturación Digital}
+Dada una señal discreta $x[n]$ con $N$ muestras y un umbral de saturación $\gamma_{\text{clip}} = 0.992$:
+\begin{equation}
+\text{Ratio}{\text{clip}} = \frac{1}{N} \sum{n=1}^{N} \mathbb{I}\left( |x[n]| \ge \gamma_{\text{clip}} \right)
+\end{equation}
+
+
+Donde $\mathbb{I}(\cdot)$ es la función indicadora. Se declara saturación activa si $\text{Ratio}_{\text{clip}} > 0.001$.
+
+\subsubsection{Formulación de Métricas}
+\begin{itemize}
+    \item \textbf{Similitud del Hablante ($S_{\text{hablante}}$):} Evalúa la fidelidad tímbrica mediante la distancia coseno entre embeddings de hablante:
+    \begin{equation}
+    S_{\text{hablante}} = \max\left(0, \frac{\mathbf{e}_{\text{ref}} \cdot \mathbf{e}_{\text{gen}}}{\|\mathbf{e}_{\text{ref}}\| \|\mathbf{e}_{\text{gen}}\|}\right) \times 100
+    \end{equation}
+    \item \textbf{Claridad Acústica ($S_{\text{acústica}}$ y $\text{SNR}_{\text{dB}}$):} Mide la relación señal-ruido en los intervalos de silencio:
+    \begin{equation}
+    \text{SNR}_{\text{dB}} = 10 \log_{10} \left( \frac{P_{\text{señal}}}{P_{\text{ruido}}} \right)
+    \end{equation}
+    Los picos que exceden $|y(t)| \ge 0.99$ activan una penalización por recorte (\emph{clipping}).
+    \item \textbf{Ritmo y Cadencia ($S_{\text{cadencia}}$):} Evalúa las palabras por minuto ($\text{WPM}_{\text{obs}}$) frente a las distribuciones normativas de velocidad de habla ($110-180\text{ WPM}$).
+    \item \textbf{Puntuación Global de Calidad ($Score_{\text{global}}$):} Agregación ponderada restringida al ancho de una sola columna:
+    \begin{equation}
+    \begin{aligned}
+    Score_{\text{global}} = \text{clip}\Bigl(&0.40 S_{\text{hablante}} + 0.40 S_{\text{acústica}} \\
+    & + 0.20 S_{\text{cadencia}} - P_{\text{recorte}},\, 10,\, 99 \Bigr)
+    \end{aligned}
+    \end{equation}
+\end{itemize}
+
+\subsection{Bucle de Retroalimentación y Reintento Adaptativo}
+Si $Score_{\text{global}} < \text{Umbral}_{\text{mín}}$ (establecido por defecto en 75), el sistema ajusta automáticamente las configuraciones de hiperparámetros (\texttt{temperature}, \texttt{top\_p}, \texttt{repetition\_penalty}) y desencadena una nueva síntesis hasta satisfacer el umbral o agotar el presupuesto de reintentos.
+
+\section{Consideraciones Previas y Aspectos de Seguridad en la Clonación Vocal}
+La clonación de voz presenta importantes desafíos técnicos, normativos y de seguridad biométrica que deben abordarse antes de la ejecución del sistema.
+
+\subsection{Requisitos Previos a la Clonación}
+Antes de iniciar el proceso de clonación, es fundamental considerar los siguientes factores técnicos:
+\begin{enumerate}
+    \item \textbf{Calidad de la Muestra de Referencia:} El audio de entrada debe ser seco, libre de reverberación, ruido ambiental o música de fondo. Las frecuencias de muestreo recomendadas son de al menos $22.05\text{ kHz}$ o $44.1\text{ kHz}$.
+    \item \textbf{Duración y Variedad Fonética:} Aunque los modelos \emph{zero-shot} operan con $3-10$ segundos de audio, una cobertura fonética equilibrada (incluyendo entonaciones expresivas y variaciones emocionales) evita artefactos de monotonía.
+    \item \textbf{Recursos de Cómputo:} La inferencia híbrida XTTS-v2 + RVC requiere aceleración por GPU (mínimo 6-8 GB de VRAM) para mantener la latencia en límites aceptables para evaluación en tiempo real.
+\end{enumerate}
+
+\subsection{Seguridad, Ética y Prevención de Suplantación}
+Dado el potencial de mal uso de la síntesis vocal hiperrealista, se deben implementar salvaguardas estrictas:
+\begin{enumerate}
+    \item \textbf{Consentimiento Informado y Autorización Explicita:} No debe realizarse la clonación de la voz de una persona sin su consentimiento formal y explícito, mitigando riesgos de fraude o difamación.
+    \item \textbf{Marcas de Agua Digitales (Watermarking):} Integración de marcas de agua acústicas imperceptibles en el espectro generado para permitir la trazabilidad del audio sintetizado.
+    \item \textbf{Riesgos de Suplantación Biométrica (Voice Spoofing):} Las plataformas que utilizan la voz como factor de autenticación biométrica (p. ej., banca telefónica) deben actualizar sus defensas mediante detectores de liveness y análisis de micro-artefactos espectrales para contrarrestar ataques Deepfake.
+\end{enumerate}
+
+\section{Plan Experimental y Evaluación}
+Se define un protocolo experimental para evaluar 50 secuencias de texto diversas utilizando múltiples referencias de hablantes:
+\begin{enumerate}
+    \item \textbf{Comparación de Fidelidad Tímbrica:} Evaluación comparativa de $S_{\text{hablante}}$ entre XTTS-v2 base frente a XTTS-v2 + RVC.
+    \item \textbf{Reducción de Defectos mediante Ajuste en Bucle Cerrado:} Medición de las tasas de recorte y alucinación en modos de bucle abierto frente a bucle cerrado.
+    \item \textbf{Validación Subjetiva:} Pruebas de escucha MUSHRA / MOS ($N=20$ evaluadores) para determinar el coeficiente de correlación de Pearson ($R^2$) entre la percepción humana y las puntuaciones automáticas.
+    \item \textbf{Integración de Referencias:} Toda la literatura citada \cite{casanova2024xtts, rvc2023, mittag2021nisqa, shen2018natural, softness2023contentvec} está vinculada dinámicamente en la bibliografía.
+\end{enumerate}
+
+\section{Conclusión}
+Este artículo presenta un marco de trabajo de clonación de voz \emph{zero-shot} en bucle cerrado que integra XTTS-v2 y RVC con un evaluador objetivo de calidad en tiempo real y salvaguardas de seguridad vocal. La arquitectura elimina la revisión manual de muestras al detectar y corregir de manera autónoma la degradación del audio. El trabajo futuro incluye la incorporación de estimadores neuronales MOS avanzados (NISQA/WavLM), aceleración mediante ONNX Runtime y la implementación activa de marcas de agua criptográficas.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

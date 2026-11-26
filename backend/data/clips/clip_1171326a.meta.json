@@ -1,0 +1,33 @@
+{
+  "clip_filename": "clip_1171326a.wav",
+  "duration_seconds": 26.0,
+  "created_at": 1789445518.0,
+  "quality": {
+    "overall_score": 86,
+    "rating": "Excelente",
+    "speaker_similarity": 73,
+    "acoustic_clarity": 97,
+    "pacing_score": 92,
+    "mos_score": 4.68,
+    "clipping_detected": false,
+    "snr_db": 42.9,
+    "duration_seconds": 26.0,
+    "details": "Buena correspondencia de voz. Audio limpio y cristalino sin ruido de fondo. Cadencia y ritmo de pronunciación naturales.",
+    "attempt_number": 1,
+    "total_attempts": 1,
+    "threshold_set": 75,
+    "met_threshold": true,
+    "attempts_history": [
+      {
+        "attempt": 1,
+        "score": 86,
+        "rating": "Excelente",
+        "similarity": 73,
+        "clarity": 97
+      }
+    ],
+    "attempts_count": 1
+  },
+  "text_prompt": "El error: \"fallo temporal\", ocurre cuando el sistema no puede traducir los nombres de dominio a dire",
+  "sample_used": "david_5_2.wav"
+}

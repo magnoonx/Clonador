@@ -1,0 +1,17 @@
+ustificación Académica de las Referencias
+Mittag et al. (2021) — NISQA
+
+Relevancia: Fundamenta la predicción no intrusiva de la puntuación promedio de opinión ($\text{MOS}_{\text{pred}}$) y la estimación de ruido/claridad acústica a partir de fragmentos de señal sin necesidad de un audio limpio de referencia absoluto.
+Enlace de acceso libre: arXiv:2004.10188
+Saeki et al. (2022) — UTMOS
+
+Relevancia: Modelo ganador del VoiceMOS Challenge 2022. Demuestra la efectividad de evaluar la naturalidad y cadencia en voz sintetizada por redes neuronales (TTS y conversión de voz).
+Enlace de acceso libre: arXiv:2204.22152
+Desplanques et al. (2020) — ECAPA-TDNN
+
+Relevancia: Justifica la extracción de speaker embeddings y la comparación mediante similitud coseno ($\text{Sim}_{\text{cosine}}$) en espacios latentes profundos para medir la fidelidad de voz del hablante sintetizado respecto a la muestra de referencia.
+Enlace de acceso libre: arXiv:2005.07143
+Reddy et al. (2021) — DNSMOS
+
+Relevancia: Avala la descomposición de la calidad percibida en dimensiones independientes (claridad de señal, distorsión por procesamiento y calidad global) en sistemas de audio digital.
+Enlace de acceso libre: arXiv:2010.13258

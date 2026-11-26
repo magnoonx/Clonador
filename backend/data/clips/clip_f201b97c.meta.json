@@ -1,0 +1,33 @@
+{
+  "clip_filename": "clip_f201b97c.wav",
+  "duration_seconds": 32.76,
+  "created_at": 1792700632.85048,
+  "quality": {
+    "overall_score": 82,
+    "rating": "Buena",
+    "speaker_similarity": 60,
+    "acoustic_clarity": 98,
+    "pacing_score": 94,
+    "mos_score": 4.72,
+    "clipping_detected": false,
+    "snr_db": 50.0,
+    "duration_seconds": 32.76,
+    "details": "Variación tímbrica apreciable. Audio limpio y cristalino sin ruido de fondo. Cadencia y ritmo de pronunciación naturales.",
+    "attempt_number": 1,
+    "total_attempts": 2,
+    "threshold_set": 75,
+    "met_threshold": true,
+    "attempts_history": [
+      {
+        "attempt": 1,
+        "score": 82,
+        "rating": "Buena",
+        "similarity": 60,
+        "clarity": 98
+      }
+    ],
+    "attempts_count": 1
+  },
+  "text_prompt": "Imaginen esto: acaban de terminar un trabajo de campo extenuante. Tienen frente a ustedes cincuenta ",
+  "sample_used": "WhatsAppPtt2026-10-22at41458PM.wav"
+}

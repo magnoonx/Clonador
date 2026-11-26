@@ -1,0 +1,33 @@
+{
+  "clip_filename": "clip_651374d8.wav",
+  "duration_seconds": 25.0,
+  "created_at": 1789443396.0,
+  "quality": {
+    "overall_score": 83,
+    "rating": "Buena",
+    "speaker_similarity": 65,
+    "acoustic_clarity": 96,
+    "pacing_score": 92,
+    "mos_score": 4.66,
+    "clipping_detected": false,
+    "snr_db": 42.1,
+    "duration_seconds": 25.0,
+    "details": "Variación tímbrica apreciable. Audio limpio y cristalino sin ruido de fondo. Cadencia y ritmo de pronunciación naturales.",
+    "attempt_number": 1,
+    "total_attempts": 1,
+    "threshold_set": 75,
+    "met_threshold": true,
+    "attempts_history": [
+      {
+        "attempt": 1,
+        "score": 83,
+        "rating": "Buena",
+        "similarity": 65,
+        "clarity": 96
+      }
+    ],
+    "attempts_count": 1
+  },
+  "text_prompt": "El error «Fallo temporal al resolver» ocurre cuando el sistema no puede traducir los nombres de domi",
+  "sample_used": "Elsy.wav"
+}

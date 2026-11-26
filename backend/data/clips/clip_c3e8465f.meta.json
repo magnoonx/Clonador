@@ -1,0 +1,33 @@
+{
+  "clip_filename": "clip_c3e8465f.wav",
+  "duration_seconds": 17.96,
+  "created_at": 1789444460.0,
+  "quality": {
+    "overall_score": 83,
+    "rating": "Buena",
+    "speaker_similarity": 63,
+    "acoustic_clarity": 96,
+    "pacing_score": 94,
+    "mos_score": 4.66,
+    "clipping_detected": false,
+    "snr_db": 41.7,
+    "duration_seconds": 17.96,
+    "details": "Variación tímbrica apreciable. Audio limpio y cristalino sin ruido de fondo. Cadencia y ritmo de pronunciación naturales.",
+    "attempt_number": 1,
+    "total_attempts": 1,
+    "threshold_set": 75,
+    "met_threshold": true,
+    "attempts_history": [
+      {
+        "attempt": 1,
+        "score": 83,
+        "rating": "Buena",
+        "similarity": 63,
+        "clarity": 96
+      }
+    ],
+    "attempts_count": 1
+  },
+  "text_prompt": "El error: \"fallo temporal\",ocurre cuando el sistema no puede traducir los nombres de dominio a direc",
+  "sample_used": "Elsy.wav"
+}

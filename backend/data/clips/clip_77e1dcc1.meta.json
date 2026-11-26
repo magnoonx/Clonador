@@ -1,0 +1,33 @@
+{
+  "clip_filename": "clip_77e1dcc1.wav",
+  "duration_seconds": 15.54,
+  "created_at": 1789446494.0,
+  "quality": {
+    "overall_score": 85,
+    "rating": "Excelente",
+    "speaker_similarity": 67,
+    "acoustic_clarity": 98,
+    "pacing_score": 95,
+    "mos_score": 4.72,
+    "clipping_detected": false,
+    "snr_db": 50.0,
+    "duration_seconds": 15.54,
+    "details": "Variación tímbrica apreciable. Audio limpio y cristalino sin ruido de fondo. Cadencia y ritmo de pronunciación naturales.",
+    "attempt_number": 1,
+    "total_attempts": 1,
+    "threshold_set": 75,
+    "met_threshold": true,
+    "attempts_history": [
+      {
+        "attempt": 1,
+        "score": 85,
+        "rating": "Excelente",
+        "similarity": 67,
+        "clarity": 98
+      }
+    ],
+    "attempts_count": 1
+  },
+  "text_prompt": "O erro \"falha temporária\" ocorre quando o sistema não consegue traduzir os nomes de domínio em ender",
+  "sample_used": "David_new.wav"
+}

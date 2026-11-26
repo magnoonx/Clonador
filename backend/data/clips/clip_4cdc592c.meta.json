@@ -1,0 +1,33 @@
+{
+  "clip_filename": "clip_4cdc592c.wav",
+  "duration_seconds": 14.12,
+  "created_at": 1789385448.0,
+  "quality": {
+    "overall_score": 82,
+    "rating": "Buena",
+    "speaker_similarity": 65,
+    "acoustic_clarity": 94,
+    "pacing_score": 92,
+    "mos_score": 4.59,
+    "clipping_detected": false,
+    "snr_db": 38.8,
+    "duration_seconds": 14.12,
+    "details": "Variación tímbrica apreciable. Audio limpio y cristalino sin ruido de fondo. Cadencia y ritmo de pronunciación naturales.",
+    "attempt_number": 1,
+    "total_attempts": 1,
+    "threshold_set": 75,
+    "met_threshold": true,
+    "attempts_history": [
+      {
+        "attempt": 1,
+        "score": 82,
+        "rating": "Buena",
+        "similarity": 65,
+        "clarity": 94
+      }
+    ],
+    "attempts_count": 1
+  },
+  "text_prompt": "Estructura de espacio afín, coordenadas baricéntricas, combinaciones convexas, grupo afín, isometría",
+  "sample_used": "Elsy.wav"
+}

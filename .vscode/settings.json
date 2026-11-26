@@ -1,0 +1,20 @@
+{
+    "liveServer.settings.ignoreFiles": [
+        "**/backend/data/**",
+        "**/backend/models/**",
+        "**/*.wav",
+        "**/*.mp3",
+        "**/*.aac",
+        "**/*.ogg"
+    ],
+    "livePreview.customFileExtensionsToIgnore": [
+        "wav",
+        "mp3",
+        "aac",
+        "ogg"
+    ],
+    "files.watcherExclude": {
+        "**/backend/data/**": true,
+        "**/backend/models/**": true
+    }
+}

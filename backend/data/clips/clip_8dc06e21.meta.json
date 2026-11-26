@@ -1,0 +1,33 @@
+{
+  "clip_filename": "clip_8dc06e21.wav",
+  "duration_seconds": 13.92,
+  "created_at": 1789385246.0,
+  "quality": {
+    "overall_score": 88,
+    "rating": "Excelente",
+    "speaker_similarity": 77,
+    "acoustic_clarity": 98,
+    "pacing_score": 92,
+    "mos_score": 4.72,
+    "clipping_detected": false,
+    "snr_db": 49.3,
+    "duration_seconds": 13.92,
+    "details": "Buena correspondencia de voz. Audio limpio y cristalino sin ruido de fondo. Cadencia y ritmo de pronunciación naturales.",
+    "attempt_number": 1,
+    "total_attempts": 1,
+    "threshold_set": 75,
+    "met_threshold": true,
+    "attempts_history": [
+      {
+        "attempt": 1,
+        "score": 88,
+        "rating": "Excelente",
+        "similarity": 77,
+        "clarity": 98
+      }
+    ],
+    "attempts_count": 1
+  },
+  "text_prompt": "Estructura de espacio afín, coordenadas baricéntricas, combinaciones convexas, grupo afín, isometría",
+  "sample_used": "david_5_2.wav"
+}

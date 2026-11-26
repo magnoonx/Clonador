@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoiceCloner AI - Estudio Portable de Clonación de Voz</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Mobile Topbar (< 992px) -->
+    <header class="mobile-topbar" id="mobileTopbar">
+        <div class="mobile-brand">
+            <div class="mobile-brand-icon">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <span class="mobile-brand-title">VoiceCloner <span>AI</span></span>
+        </div>
+        <div class="mobile-top-actions">
+            <button type="button" class="mobile-status-pill" id="mobileStatusPill" title="Ver estado de hardware e IA">
+                <span class="status-dot online" id="mobileStatusDot"></span>
+                <span id="mobileStatusText">Conectando...</span>
+            </button>
+            <button type="button" class="mobile-menu-btn" id="openDrawerBtn" aria-label="Abrir panel de control">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Sidebar Backdrop for Mobile Drawer -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <div class="brand-left">
+                    <div class="brand-icon">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <div class="brand-text">
+                        <h2>VoiceCloner <span>AI</span></h2>
+                        <span class="badge-portable"><i class="fa-solid fa-hard-drive"></i> USB Portable</span>
+                    </div>
+                </div>
+                <button type="button" class="drawer-close-btn" id="closeSidebarBtn" aria-label="Cerrar menú">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <nav class="nav-menu">
+                <button type="button" class="nav-item active" data-tab="studio">
+                    <i class="fa-solid fa-microphone-lines"></i>
+                    <span>Estudio & Grabador</span>
+                </button>
+                <button type="button" class="nav-item" data-tab="samples">
+                    <i class="fa-solid fa-record-vinyl"></i>
+                    <span>Muestras de Voz</span>
+                </button>
+                <button type="button" class="nav-item" data-tab="clips">
+                    <i class="fa-solid fa-music"></i>
+                    <span>Clips Generados</span>
+                </button>
+            </nav>
+
+            <div class="status-card glass-panel">
+                <div class="status-header">
+                    <span class="status-dot online" id="statusDot"></span>
+                    <span class="status-title" id="statusText">Conectando...</span>
+                </div>
+                <div class="status-details">
+                    <div class="stat-row">
+                        <span class="stat-label">Hardware:</span>
+                        <span class="stat-val" id="hwDevice"><i class="fa-solid fa-microchip"></i> Detectando</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Modelo Local:</span>
+                        <span class="stat-val" id="modelStatus"><i class="fa-solid fa-box"></i> Listo</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Ruta Modelo:</span>
+                        <span class="stat-val path-val" title="./backend/models/">./backend/models/</span>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary btn-block btn-sm mt-10" id="downloadModelBtn">
+                    <i class="fa-solid fa-cloud-arrow-down"></i> Inicializar Modelo Local
+                </button>
+
+                <!-- Model Init Progress Box (0% a 100%) -->
+                <div class="model-loader-box hidden mt-10" id="modelLoaderBox">
+                    <div class="loader-top-row">
+                        <div class="loader-title-group">
+                            <div class="spinner-sm"></div>
+                            <div class="loader-text">
+                                <h5 style="margin: 0; font-size: 12px; font-weight: 600; color: #fff;">Cargando Modelo IA...</h5>
+                            </div>
+                        </div>
+                        <span class="progress-percent" id="modelProgressPercent" style="font-size: 12px; padding: 2px 8px; min-width: 44px;">0%</span>
+                    </div>
+
+                    <!-- Barra de Progreso 0% a 100% -->
+                    <div class="progress-track" style="height: 7px; margin-top: 6px;">
+                        <div class="progress-fill" id="modelProgressBarFill" style="width: 0%;"></div>
+                    </div>
+
+                    <div class="loader-status-row" style="margin-top: 4px;">
+                        <span class="loader-status-detail" id="modelLoaderStatus" style="font-size: 11px;">Iniciando carga de tensores...</span>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- TAB 1: STUDIO (RECORD & GENERATE) -->
+            <section id="tab-studio" class="tab-page active">
+                <div class="page-header">
+                    <div>
+                        <h1>Estudio de Clonación de Voz</h1>
+                        <p class="subtitle">Graba tu voz o selecciona una muestra para generar clips personalizados con IA de alta fidelidad.</p>
+                    </div>
+                </div>
+
+                <div class="grid-2col">
+                    <!-- Audio Recording Panel -->
+                    <div class="card glass-card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-microphone"></i> 1. Graba tu Voz (Muestra)</h3>
+                            <span class="tooltip-info" title="Graba entre 3 y 10 segundos hablando con tono natural y sin ruido de fondo.">
+                                <i class="fa-solid fa-circle-info"></i> 3-10 seg
+                            </span>
+                        </div>
+                        <div class="card-body align-center">
+                            <div class="recorder-circle" id="recordBtn">
+                                <i class="fa-solid fa-microphone" id="recordIcon"></i>
+                            </div>
+                            <div class="recording-timer" id="recordingTimer">00:00</div>
+                            <p class="recorder-hint" id="recorderHint">Haz clic para comenzar a grabar tu voz</p>
+
+                            <!-- Captura nativa para dispositivos móviles (funciona sin HTTPS en red local) -->
+                            <input type="file" id="mobileMicInput" accept="audio/*,.m4a,.aac,.wav,.mp3,.ogg,.3gp" capture="microphone" hidden>
+
+                            <div class="audio-preview-container hidden" id="audioPreviewContainer">
+                                <audio id="sampleAudioPreview" controls></audio>
+                                <div class="input-group mt-15">
+                                    <input type="text" id="sampleNameInput" placeholder="Nombre de la muestra (Ej: MiVoz_VozNormal)" class="styled-input">
+                                    <button type="button" class="btn btn-primary" id="saveSampleBtn">
+                                        <i class="fa-solid fa-floppy-disk"></i> Guardar Muestra
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="divider"><span>O subir archivo de Audio (.aac, .m4a, .wav, .mp3)</span></div>
+
+                            <div class="file-upload-dropzone" id="dropzone">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                <span>Arrastra o haz clic para subir tu audio (.aac, .m4a, .wav, .mp3)</span>
+                                <input type="file" id="fileInput" accept="audio/*,.aac,.m4a,.wav,.mp3,.ogg,.flac" hidden>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Clip Generator Panel -->
+                    <div class="card glass-card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-wand-magic"></i> 2. Generar Clip con tu Voz</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="selectSample">Seleccionar Muestra de Voz de Referencia:</label>
+                                <select id="selectSample" class="styled-select">
+                                    <option value="">-- Carga o graba una muestra primero --</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="textPrompt">Texto para Sintetizar (Guion en Español):</label>
+                                <textarea id="textPrompt" rows="5" class="styled-textarea" placeholder="Escribe aquí el texto que quieres que el modelo lea con tu propia voz... (Ej: Hola, este es un clip generado localmente con mi propia voz procesado en mi unidad USB.)"></textarea>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group flex-1">
+                                    <label for="selectLang">Idioma:</label>
+                                    <select id="selectLang" class="styled-select">
+                                        <option value="es" selected>Español (es)</option>
+                                        <option value="en">Inglés (en)</option>
+                                        <option value="pt">Portugués (pt)</option>
+                                        <option value="fr">Francés (fr)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group flex-1">
+                                    <label for="selectFormat">Formato de Salida:</label>
+                                    <select id="selectFormat" class="styled-select">
+                                        <option value="wav" selected>WAV (PCM Sin Compresión)</option>
+                                        <option value="mp3">MP3 (Ligero y Universal)</option>
+                                        <option value="aac">AAC (Audio Móvil / Celular)</option>
+                                        <option value="ogg">OGG (Formato Web)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+
+                            <details class="advanced-settings-box">
+                                <summary><i class="fa-solid fa-sliders"></i> Ajustes Avanzados de Clonación (Hiperparámetros XTTS-v2)</summary>
+                                <div class="form-row mt-15">
+                                    <div class="form-group flex-1">
+                                        <label for="tempInput" title="Añade variabilidad tonal y expresividad">Expresividad (Temp): <span id="tempVal">0.75</span></label>
+                                        <input type="range" id="tempInput" min="0.1" max="1.2" step="0.05" value="0.75" class="styled-range" oninput="document.getElementById('tempVal').innerText = parseFloat(this.value).toFixed(2)">
+                                    </div>
+                                    <div class="form-group flex-1">
+                                        <label for="topPInput" title="Expande la diversidad del vocabulario fonético">Diversidad (Top-P): <span id="topPVal">0.85</span></label>
+                                        <input type="range" id="topPInput" min="0.1" max="1.0" step="0.05" value="0.85" class="styled-range" oninput="document.getElementById('topPVal').innerText = parseFloat(this.value).toFixed(2)">
+                                    </div>
+                                </div>
+                                <div class="form-row mt-10">
+                                    <div class="form-group flex-1">
+                                        <label for="topKInput" title="Mantiene controladas las alucinaciones tonales extremas">Control Alucinación (Top-K): <span id="topKVal">50</span></label>
+                                        <input type="range" id="topKInput" min="1" max="100" step="1" value="50" class="styled-range" oninput="document.getElementById('topKVal').innerText = parseInt(this.value, 10)">
+                                    </div>
+                                    <div class="form-group flex-1">
+                                        <label for="repPenaltyInput" title="Evita repetición armónica o melodía plana">Penalización Repetición: <span id="repPenaltyVal">3.50</span></label>
+                                        <input type="range" id="repPenaltyInput" min="1.0" max="10.0" step="0.5" value="3.50" class="styled-range" oninput="document.getElementById('repPenaltyVal').innerText = parseFloat(this.value).toFixed(2)">
+                                    </div>
+                                </div>
+                                <div class="form-row mt-10">
+                                    <div class="form-group flex-1">
+                                        <label for="lengthPenaltyInput" title="Penaliza o premia frases largas (neutro=1.0)">Ritmo Final (Length Pen.): <span id="lengthPenaltyVal">1.00</span></label>
+                                        <input type="range" id="lengthPenaltyInput" min="0.5" max="2.0" step="0.05" value="1.00" class="styled-range" oninput="document.getElementById('lengthPenaltyVal').innerText = parseFloat(this.value).toFixed(2)">
+                                    </div>
+                                    <div class="form-group flex-1">
+                                        <label for="speedInput" title="Velocidad general de lectura">Velocidad: <span id="speedVal">1.00x</span></label>
+                                        <input type="range" id="speedInput" min="0.7" max="1.4" step="0.05" value="1.00" class="styled-range" oninput="document.getElementById('speedVal').innerText = parseFloat(this.value).toFixed(2) + 'x'">
+                                    </div>
+                                </div>
+                            </details>
+                            <!-- RVC Voice Enhancement Panel (Nivel 3) -->
+                            <div class="rvc-feature-box mt-15 mb-20" style="background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 12px; padding: 14px 16px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <label for="enableRvcCheckbox" style="font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; color: #a5b4fc; margin: 0;">
+                                        <input type="checkbox" id="enableRvcCheckbox" style="width: 18px; height: 18px; cursor: pointer; accent-color: #6366f1;" checked>
+                                        <span><i class="fa-solid fa-wand-magic-sparkles"></i> Activar Afinación RVC (Timbre Real Hiperrealista)</span>
+                                    </label>
+                                    <span class="badge" style="background: #4f46e5; color: #fff; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700;">Nivel 3</span>
+                                </div>
+                                <div id="rvcOptionsContainer" class="form-row mt-10">
+                                    <div class="form-group flex-1">
+                                        <label for="selectRvcModel" style="font-size: 12px; color: #94a3b8;">Modelo de Voz (.pth):</label>
+                                        <select id="selectRvcModel" class="styled-select">
+                                            <option value="david">david.pth</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group flex-1">
+                                        <label for="rvcPitchInput" style="font-size: 12px; color: #94a3b8;">Ajuste de Tono (Semitonos): <span id="rvcPitchVal">0</span></label>
+                                        <input type="range" id="rvcPitchInput" min="-12" max="12" step="1" value="0" class="styled-range">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- AI Quality & Auto-retry Control Panel -->
+                            <div class="quality-feature-box mt-15 mb-15">
+                                <div class="quality-header-row">
+                                    <label for="evalQualityCheckbox" class="checkbox-label-title">
+                                        <input type="checkbox" id="evalQualityCheckbox" checked>
+                                        <span><i class="fa-solid fa-brain"></i> Calificación Automática de Calidad por IA</span>
+                                    </label>
+                                    <span class="badge badge-quality-ai"><i class="fa-solid fa-sparkles"></i> Auto-QA</span>
+                                </div>
+                                <div id="qualityOptionsContainer" class="quality-options-container mt-12">
+                                    <div class="quality-retry-toggle-row">
+                                        <label for="autoRetryCheckbox" class="checkbox-label-sub">
+                                            <input type="checkbox" id="autoRetryCheckbox">
+                                            <span><i class="fa-solid fa-arrows-rotate"></i> Autoreintentar generación si la calidad es inferior al umbral</span>
+                                        </label>
+                                    </div>
+                                    <div id="retrySettingsRow" class="form-row mt-12" style="display: none;">
+                                        <div class="form-group flex-1">
+                                            <label for="qualityThresholdInput" title="Si el clip no alcanza este puntaje, se reintentará automáticamente con variaciones">
+                                                Umbral Mínimo Deseado: <span id="qualityThresholdVal" class="quality-threshold-badge">75%</span>
+                                            </label>
+                                            <input type="range" id="qualityThresholdInput" min="50" max="95" step="1" value="75" class="styled-range">
+                                        </div>
+                                        <div class="form-group" style="max-width: 170px;">
+                                            <label for="maxRetriesSelect" title="Número máximo de reintentos automáticos permitidos">Máx. Reintentos:</label>
+                                            <select id="maxRetriesSelect" class="styled-select">
+                                                <option value="1">1 reintento</option>
+                                                <option value="2" selected>2 reintentos</option>
+                                                <option value="3">3 reintentos</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Settings Persistence Bar -->
+                            <div class="settings-persistence-bar mb-20">
+                                <div class="settings-persistence-info">
+                                    <i class="fa-solid fa-floppy-disk text-muted"></i>
+                                    <span id="settingsStatusText">Parámetros sincronizados y guardados para futuras sesiones</span>
+                                </div>
+                                <button type="button" class="btn btn-ghost btn-xs" id="resetSettingsBtn" title="Restablecer todos los controles a valores predeterminados de fábrica">
+                                    <i class="fa-solid fa-rotate-left"></i> Restablecer por defecto
+                                </button>
+                            </div>
+
+                            <button type="button" class="btn btn-accent btn-block btn-lg" id="generateClipBtn">
+                                <i class="fa-solid fa-play"></i> Generar Clip de Voz Local
+                            </button>
+
+                            <!-- Generating Overlay/Loader with 0% to 100% Progress Bar -->
+                            <div class="loader-box hidden" id="clipLoader">
+                                <div class="loader-top-row">
+                                    <div class="loader-title-group">
+                                        <div class="spinner"></div>
+                                        <div class="loader-text">
+                                            <h4>Clonando Voz en Tiempo Real...</h4>
+                                            <p id="loaderSubtext">Procesando inferencia de red neuronal en ./backend/models/</p>
+                                        </div>
+                                    </div>
+                                    <div class="progress-badge-wrapper">
+                                        <span class="progress-percent" id="progressPercent">0%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Barra de Progreso 0% a 100% -->
+                                <div class="progress-track">
+                                    <div class="progress-fill" id="progressBarFill" style="width: 0%;"></div>
+                                </div>
+
+                                <div class="loader-status-row">
+                                    <span class="loader-status-detail" id="loaderStatusDetail">Iniciando síntesis neuronal...</span>
+                                    <span class="loader-step-indicator" id="loaderStepIndicator">Paso 1 de 2</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Latest Generated Clip Result -->
+                <div class="card glass-card mt-25 hidden" id="resultCard">
+                    <div class="card-header text-success">
+                        <h3><i class="fa-solid fa-circle-check"></i> ¡Clip Generado Con Éxito!</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="flex-row space-between align-center">
+                            <div class="audio-player-wrapper">
+                                <audio id="resultAudioPlayer" controls></audio>
+                            </div>
+                            <div class="actions-group">
+                                <a id="downloadResultBtn" href="#" download class="btn btn-outline">
+                                    <i class="fa-solid fa-download"></i> Descargar WAV
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- AI Quality Scorecard -->
+                        <div id="qualityScorecard" class="quality-scorecard hidden mt-20">
+                            <div class="scorecard-header">
+                                <div class="scorecard-badge-container">
+                                    <div class="score-pill" id="scoreOverallPill">
+                                        <span class="score-number" id="scoreOverallVal">--%</span>
+                                        <span class="score-label" id="scoreRatingVal">Excelente</span>
+                                    </div>
+                                </div>
+                                <div class="scorecard-meta">
+                                    <h4 id="scoreHeadline"><i class="fa-solid fa-award text-warning"></i> Calificación de Calidad por IA</h4>
+                                    <p id="scoreDetailsText" class="scorecard-details">Evaluando características acústicas y similitud de voz...</p>
+                                    <div id="scoreAttemptsNotice" class="attempts-notice hidden">
+                                        <i class="fa-solid fa-arrows-rotate"></i> <span id="scoreAttemptsText">Generado en 1 intento</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="scorecard-metrics-grid mt-15">
+                                <div class="metric-card">
+                                    <div class="metric-info">
+                                        <span class="metric-name"><i class="fa-solid fa-fingerprint"></i> Similitud de Voz</span>
+                                        <span class="metric-val" id="metricSimilarityVal">--%</span>
+                                    </div>
+                                    <div class="metric-track">
+                                        <div class="metric-fill fill-similarity" id="metricSimilarityFill" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-info">
+                                        <span class="metric-name"><i class="fa-solid fa-wave-square"></i> Claridad Acústica (MOS)</span>
+                                        <span class="metric-val" id="metricClarityVal">-- / 5.0 ⭐</span>
+                                    </div>
+                                    <div class="metric-track">
+                                        <div class="metric-fill fill-clarity" id="metricClarityFill" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-info">
+                                        <span class="metric-name"><i class="fa-solid fa-stopwatch"></i> Fluidez y Ritmo</span>
+                                        <span class="metric-val" id="metricPacingVal">--%</span>
+                                    </div>
+                                    <div class="metric-track">
+                                        <div class="metric-fill fill-pacing" id="metricPacingFill" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: SAMPLES LIBRARY -->
+            <section id="tab-samples" class="tab-page">
+                <div class="page-header">
+                    <div>
+                        <h1>Muestras de Voz Guardadas</h1>
+                        <p class="subtitle">Tus perfiles de voz grabados almacenados localmente en backend/data/samples.</p>
+                    </div>
+                </div>
+
+                <div class="grid-cards" id="samplesGrid">
+                    <!-- Sample cards inserted dynamically -->
+                </div>
+            </section>
+
+            <!-- TAB 3: CLIPS LIBRARY -->
+            <section id="tab-clips" class="tab-page">
+                <div class="page-header">
+                    <div>
+                        <h1>Biblioteca de Clips Generados</h1>
+                        <p class="subtitle">Historial de clips generados con tu modelo local.</p>
+                    </div>
+                </div>
+
+                <div class="grid-cards" id="clipsGrid">
+                    <!-- Clip cards inserted dynamically -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Mobile Bottom Navigation Bar (< 992px) -->
+    <nav class="mobile-bottom-nav" id="mobileBottomNav">
+        <button type="button" class="bottom-nav-item active" data-tab="studio">
+            <i class="fa-solid fa-microphone-lines"></i>
+            <span>Estudio</span>
+        </button>
+        <button type="button" class="bottom-nav-item" data-tab="samples">
+            <i class="fa-solid fa-record-vinyl"></i>
+            <span>Muestras</span>
+        </button>
+        <button type="button" class="bottom-nav-item" data-tab="clips">
+            <i class="fa-solid fa-music"></i>
+            <span>Clips</span>
+        </button>
+        <button type="button" class="bottom-nav-item" id="bottomNavHardwareBtn">
+            <i class="fa-solid fa-sliders"></i>
+            <span>Hardware</span>
+        </button>
+    </nav>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast hidden">
+        <i class="fa-solid fa-info-circle" id="toastIcon"></i>
+        <span id="toastMsg">Mensaje</span>
+    </div>
+
+    <script src="app.js?v=1.5"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "clip_filename": "clip_d7d1a2e3.wav",
+  "duration_seconds": 16.3,
+  "created_at": 1789249234.0,
+  "quality": {
+    "overall_score": 88,
+    "rating": "Excelente",
+    "speaker_similarity": 74,
+    "acoustic_clarity": 98,
+    "pacing_score": 95,
+    "mos_score": 4.72,
+    "clipping_detected": false,
+    "snr_db": 50.0,
+    "duration_seconds": 16.3,
+    "details": "Buena correspondencia de voz. Audio limpio y cristalino sin ruido de fondo. Cadencia y ritmo de pronunciación naturales.",
+    "attempt_number": 1,
+    "total_attempts": 1,
+    "threshold_set": 75,
+    "met_threshold": true,
+    "attempts_history": [
+      {
+        "attempt": 1,
+        "score": 88,
+        "rating": "Excelente",
+        "similarity": 74,
+        "clarity": 98
+      }
+    ],
+    "attempts_count": 1
+  },
+  "text_prompt": "En la reunión del lunes a las 9 am, se convino aprobar el presupuesto, asumiendo cambios en la papel",
+  "sample_used": "david_5_2.wav"
+}
